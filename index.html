@@ -3,40 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forex Calculator</title>
+<title>Trade FX Calculator</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: #0a0e14; color: #e6e9ef; min-height: 100vh;
-    display: flex; align-items: center; justify-content: center; padding: 24px;
+    background: #0a0e14; color: #e6e9ef; min-height: 100vh; padding: 20px 14px 40px;
   }
-  .card {
-    background: #11161f; border: 1px solid #1e2632; border-radius: 20px;
-    padding: 48px 40px; max-width: 520px; width: 100%; text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
-  }
-  .logo {
-    width: 64px; height: 64px; margin: 0 auto 20px; border-radius: 18px;
+  .wrap { max-width: 640px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 18px; }
+  header .logo {
+    width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 15px;
     background: linear-gradient(135deg, #2F80FF, #22C55E);
     display: flex; align-items: center; justify-content: center;
-    font-size: 30px; font-weight: 800; color: #fff;
+    font-size: 24px; font-weight: 800; color: #fff;
   }
-  h1 { font-size: 28px; letter-spacing: -0.5px; margin-bottom: 8px; }
-  p { color: #8b94a3; font-size: 15px; line-height: 1.6; }
-  .status {
-    margin-top: 24px; display: inline-block; font-size: 13px; font-weight: 600;
-    color: #22C55E; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3);
-    padding: 8px 18px; border-radius: 30px;
+  header h1 { font-size: 24px; letter-spacing: -0.4px; }
+  header p { color: #8b94a3; font-size: 14px; margin-top: 4px; }
+  .card {
+    background: #11161f; border: 1px solid #1e2632; border-radius: 16px;
+    padding: 20px; margin-bottom: 14px;
   }
+  .card h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #8b94a3; margin-bottom: 14px; }
+  label.field { display: block; margin-bottom: 14px; }
+  label.field span.lbl { display: block; font-size: 13px; color: #8b94a3; margin-bottom: 6px; }
+  label.field .hint { font-size: 12px; color: #5c6575; margin-top: 5px; display: block; }
+  input[type="number"], input[type="text"] {
+    width: 100%; background: #0a0e14; border: 1px solid #2a3342; color: #fff;
+    border-radius: 10px; padding: 12px 14px; font-size: 17px; font-family: inherit;
+  }
+  input:focus { outline: none; border-color: #2F80FF; }
+  .input-row { display: flex; gap: 10px; }
+  .input-row .grow { flex: 1; }
+  .prefix { position: relative; }
+  .prefix::before {
+    content: "$"; position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: #8b94a3; font-size: 17px;
+  }
+  .prefix input { padding-left: 30px; }
+  .suffix { position: relative; }
+  .suffix::after {
+    content: "%"; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: #8b94a3; font-size: 17px;
+  }
+  .suffix input { padding-right: 32px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .pills .plabel { width: 100%; font-size: 13px; color: #8b94a3; margin-bottom: 2px; }
+  .pill {
+    background: #0a0e14; border: 1px solid #2a3342; color: #cfd6e0;
+    border-radius: 30px; padding: 9px 18px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .pill.active {
+    background: linear-gradient(135deg, #2F80FF, #22C55E); border-color: transparent; color: #fff;
+  }
+  .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 2px; }
+  .switch-row .t { font-size: 14px; }
+  .switch-row .s { font-size: 12px; color: #8b94a3; margin-top: 2px; }
+  .switch { position: relative; width: 48px; height: 28px; flex-shrink: 0; cursor: pointer; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .track {
+    position: absolute; inset: 0; background: #2a3342; border-radius: 20px; transition: .2s;
+  }
+  .track::before {
+    content: ""; position: absolute; width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px; transition: .2s;
+  }
+  .switch input:checked + .track { background: #22C55E; }
+  .switch input:checked + .track::before { left: 23px; }
+  .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat {
+    background: #11161f; border: 1px solid #1e2632; border-radius: 14px; padding: 16px;
+  }
+  .stat.hero { grid-column: 1 / -1; text-align: center; padding: 22px 16px;
+    background: linear-gradient(135deg, rgba(47,128,255,.14), rgba(34,197,94,.14));
+    border-color: rgba(47,128,255,.35);
+  }
+  .stat .k { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: #8b94a3; margin-bottom: 6px; }
+  .stat .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat.hero .v { font-size: 34px; }
+  .pos { color: #22C55E; } .neg { color: #F23645; } .mut { color: #8b94a3; }
+  #chart { width: 100%; height: auto; display: block; }
+  .table-wrap { max-height: 420px; overflow-y: auto; border-radius: 10px; border: 1px solid #1e2632; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  thead th {
+    position: sticky; top: 0; background: #161c26; color: #8b94a3; font-weight: 600;
+    text-align: right; padding: 10px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+    white-space: nowrap;
+  }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 9px 10px; border-top: 1px solid #1a2130; text-align: right; white-space: nowrap; }
+  tbody td.day { color: #8b94a3; }
+  tbody tr.today td { background: rgba(47,128,255,.08); }
+  .net { font-weight: 700; }
+  footer { text-align: center; color: #5c6575; font-size: 12px; margin-top: 18px; line-height: 1.6; padding: 0 10px; }
 </style>
 </head>
 <body>
-  <div class="card">
+<div class="wrap">
+
+  <header>
     <div class="logo">FX</div>
-    <h1>Forex Calculator</h1>
-    <p>Shell is live. Tell me what to build — lot-size calculator, pip-value, margin, risk/reward — and it goes here.</p>
-    <span class="status">● Live</span>
+    <h1>Trade FX Calculator</h1>
+    <p>Set your capital, daily target &amp; timeframe — see every day's target.</p>
+  </header>
+
+  <div class="card">
+    <h2>Your plan</h2>
+
+    <label class="field">
+      <span class="lbl">Starting capital</span>
+      <div class="prefix"><input type="number" id="capital" value="100" min="1" step="any" inputmode="decimal"></div>
+    </label>
+
+    <div class="pills" id="targetPills">
+      <span class="plabel">Daily profit target</span>
+      <button class="pill" data-v="0.5">0.5%</button>
+      <button class="pill" data-v="1">1%</button>
+      <button class="pill active" data-v="2">2%</button>
+      <button class="pill" data-v="3">3%</button>
+      <button class="pill" data-v="5">5%</button>
+    </div>
+    <label class="field">
+      <span class="lbl">Or type your own daily target</span>
+      <div class="suffix"><input type="number" id="targetPct" value="2" min="0" step="any" inputmode="decimal"></div>
+    </label>
+
+    <label class="field">
+      <span class="lbl">Daily withdrawal for personal expenses</span>
+      <div class="suffix"><input type="number" id="withdrawPct" value="0" min="0" step="any" inputmode="decimal"></div>
+      <span class="hint">Example: target 2% but withdraw 1% daily → your capital still grows 1% a day.</span>
+    </label>
+
+    <div class="pills" id="durPills">
+      <span class="plabel">Timeframe</span>
+      <button class="pill" data-v="7">1 week</button>
+      <button class="pill active" data-v="30">1 month</button>
+      <button class="pill" data-v="90">3 months</button>
+      <button class="pill" data-v="180">6 months</button>
+      <button class="pill" data-v="365">1 year</button>
+    </div>
+
+    <div class="switch-row">
+      <div>
+        <div class="t">Forex market days only</div>
+        <div class="s">Skip Saturday &amp; Sunday — the market is closed</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="tradingOnly" checked>
+        <span class="track"></span>
+      </label>
+    </div>
   </div>
+
+  <div class="summary">
+    <div class="stat hero">
+      <div class="k">Final balance</div>
+      <div class="v pos" id="finalBal">$0</div>
+      <div class="k" id="dayCount" style="margin-top:6px"></div>
+    </div>
+    <div class="stat"><div class="k">Total profit earned</div><div class="v pos" id="totProfit">$0</div></div>
+    <div class="stat"><div class="k">Total withdrawn</div><div class="v" id="totWd">$0</div></div>
+    <div class="stat"><div class="k">Growth multiple</div><div class="v" id="multiple">×0</div></div>
+    <div class="stat"><div class="k">Net daily growth</div><div class="v" id="netDaily">0%</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Growth chart</h2>
+    <svg id="chart" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+
+  <div class="card">
+    <h2>Day-by-day plan</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Day</th><th>Date</th><th>Start</th><th>Target +</th><th>Withdraw −</th><th>End</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    Projections only — the market never guarantees a fixed daily return.<br>
+    Built for planning your compounding strategy, not financial advice.
+  </footer>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt$ = n => (n < 0 ? "-$" : "$") + Math.abs(n).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fmtD = d => d.toLocaleDateString("en-GB", {day: "2-digit", month: "short"});
+
+function pillGroup(elId, initial, onPick) {
+  const el = $(elId);
+  let val = initial;
+  el.addEventListener("click", e => {
+    const b = e.target.closest(".pill");
+    if (!b) return;
+    val = parseFloat(b.dataset.v);
+    el.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+    b.classList.add("active");
+    onPick(val);
+  });
+  return { get: () => val, set: v => {
+    val = v;
+    el.querySelectorAll(".pill").forEach(p => p.classList.toggle("active", parseFloat(p.dataset.v) === v));
+  }};
+}
+
+const targetPills = pillGroup("targetPills", 2, v => { $("targetPct").value = v; render(); });
+const durPills = pillGroup("durPills", 30, () => render());
+
+$("targetPct").addEventListener("input", e => {
+  const v = parseFloat(e.target.value);
+  if (!isNaN(v)) targetPills.set(v);
+  render();
+});
+["capital", "withdrawPct"].forEach(id => $(id).addEventListener("input", render));
+$("tradingOnly").addEventListener("change", render);
+
+function compute() {
+  const capital = Math.max(0, parseFloat($("capital").value) || 0);
+  const tp = Math.max(0, parseFloat($("targetPct").value) || 0);
+  const wp = Math.max(0, parseFloat($("withdrawPct").value) || 0);
+  const windowDays = durPills.get();
+  const tradingOnly = $("tradingOnly").checked;
+
+  const rows = [];
+  let bal = capital, totP = 0, totW = 0;
+  const d = new Date();
+  const endWindow = new Date(d); endWindow.setDate(endWindow.getDate() + windowDays);
+
+  while (d < endWindow) {
+    const dow = d.getDay();
+    const isTrading = !tradingOnly || (dow !== 0 && dow !== 6);
+    if (isTrading) {
+      const profit = bal * tp / 100;
+      const wd = bal * wp / 100;
+      const end = bal + profit - wd;
+      rows.push({ n: rows.length + 1, date: new Date(d), start: bal, profit, wd, end });
+      totP += profit; totW += wd; bal = end;
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return { rows, capital, tp, wp, final: bal, totP, totW };
+}
+
+function drawChart(rows) {
+  const svg = $("chart");
+  const W = 600, H = 240, P = 34;
+  if (!rows.length) { svg.innerHTML = ""; return; }
+  const vals = rows.map(r => r.end);
+  let min = Math.min(...vals), max = Math.max(...vals);
+  if (max === min) { max = min * 1.1 || 1; }
+  const X = i => P + (i / (vals.length - 1 || 1)) * (W - 2 * P);
+  const Y = v => H - P - ((v - min) / (max - min)) * (H - 2 * P);
+  const pts = vals.map((v, i) => X(i).toFixed(1) + "," + Y(v).toFixed(1)).join(" ");
+  svg.innerHTML =
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#22C55E" stop-opacity=".35"/>' +
+    '<stop offset="1" stop-color="#22C55E" stop-opacity="0"/></linearGradient></defs>' +
+    '<polygon points="' + P + ',' + (H - P) + ' ' + pts + ' ' + (W - P) + ',' + (H - P) + '" fill="url(#g)"/>' +
+    '<polyline points="' + pts + '" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<circle cx="' + X(vals.length - 1) + '" cy="' + Y(vals[vals.length - 1]) + '" r="5" fill="#22C55E"/>' +
+    '<text x="' + P + '" y="18" fill="#8b94a3" font-size="12">' + fmt$(max) + '</text>' +
+    '<text x="' + P + '" y="' + (H - 8) + '" fill="#8b94a3" font-size="12">' + fmt$(min) + '</text>';
+}
+
+function render() {
+  const { rows, capital, tp, wp, final, totP, totW } = compute();
+
+  const fEl = $("finalBal");
+  fEl.textContent = fmt$(final);
+  fEl.className = "v " + (final >= capital ? "pos" : "neg");
+  $("dayCount").textContent = rows.length + " compounding days";
+  $("totProfit").textContent = fmt$(totP);
+  $("totWd").textContent = fmt$(totW);
+  $("multiple").textContent = capital > 0 ? "×" + (final / capital).toFixed(2) : "×0";
+  const net = tp - wp;
+  const nd = $("netDaily");
+  nd.textContent = (net > 0 ? "+" : "") + net.toFixed(2).replace(/\.00$/, "") + "%";
+  nd.className = "v " + (net > 0 ? "pos" : net < 0 ? "neg" : "mut");
+
+  drawChart(rows);
+
+  const tb = $("rows");
+  tb.innerHTML = rows.map((r, i) =>
+    "<tr" + (i === 0 ? ' class="today"' : "") + ">" +
+    "<td class='day'>" + r.n + "</td>" +
+    "<td class='day'>" + fmtD(r.date) + "</td>" +
+    "<td>" + fmt$(r.start) + "</td>" +
+    "<td class='pos'>+" + fmt$(r.profit).replace("$", "$") + "</td>" +
+    "<td class='mut'>−" + fmt$(r.wd).replace("$", "$").replace("-", "") + "</td>" +
+    "<td class='net'>" + fmt$(r.end) + "</td>" +
+    "</tr>"
+  ).join("");
+}
+
+render();
+</script>
 </body>
 </html>

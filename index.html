@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trade FX Calculator</title>
+<link rel="icon" href="logo.webp">
+<title>Daud Trade FX - Calculator</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -13,10 +14,8 @@
   .wrap { max-width: 640px; margin: 0 auto; }
   header { text-align: center; margin-bottom: 18px; }
   header .logo {
-    width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 15px;
-    background: linear-gradient(135deg, #2F80FF, #22C55E);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; font-weight: 800; color: #fff;
+    width: 56px; height: 56px; margin: 0 auto 10px; border-radius: 16px;
+    object-fit: cover; display: block;
   }
   header h1 { font-size: 24px; letter-spacing: -0.4px; }
   header p { color: #8b94a3; font-size: 14px; margin-top: 4px; }
@@ -141,8 +140,8 @@
 <div class="wrap">
 
   <header>
-    <div class="logo">FX</div>
-    <h1>Trade FX Calculator</h1>
+    <img class="logo" src="logo.webp" alt="Daud Trade FX logo">
+    <h1>Daud Trade FX - Calculator</h1>
     <p>Set your capital, daily target &amp; timeframe — see every day's target.</p>
   </header>
 
@@ -347,7 +346,7 @@ function render() {
   const prow = (k, v) => '<tr><td style="padding:6px 8px;border-bottom:1px solid #ddd;color:#555">' + k +
     '</td><td style="padding:6px 8px;border-bottom:1px solid #ddd;text-align:right;font-weight:700">' + v + '</td></tr>';
   $("printSummary").innerHTML =
-    '<div style="margin-bottom:14px"><div style="font-size:22px;font-weight:800">Trade FX Calculator — Compounding Plan</div>' +
+    '<div style="margin-bottom:14px"><div style="font-size:22px;font-weight:800">Daud Trade FX - Calculator — Compounding Plan</div>' +
     '<div style="color:#555;font-size:13px">Generated ' +
     new Date().toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"}) +
     ' · by Daud Trade FX</div></div>' +
